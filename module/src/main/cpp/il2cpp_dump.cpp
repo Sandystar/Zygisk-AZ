@@ -431,8 +431,8 @@ void il2cpp_dump(const char *outDir) {
 void hack_lua() {
     LOGI("start hack lua");
 
-    Il2CppImage* game;
-    Il2CppImage* corlib;
+    const Il2CppImage* game;
+    const Il2CppImage* corlib;
 
     size_t size;
     auto domain = il2cpp_domain_get();

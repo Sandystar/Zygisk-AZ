@@ -16,6 +16,8 @@
 #include <sys/mman.h>
 #include <linux/unistd.h>
 #include <array>
+#include "il2cpp-tabledefs.h"
+#include "il2cpp-class.h"
 
 static std::string GetNativeBridgeLibrary() {
     auto value = std::array<char, PROP_VALUE_MAX>();

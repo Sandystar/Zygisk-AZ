@@ -2,6 +2,7 @@
 // Created by Perfare on 2020/7/4.
 //
 
+#include "utf8.h"
 #include "il2cpp_lua.h"
 #include <jni.h>
 #include "hack.h"
@@ -61,26 +62,31 @@ void il2cpp_api_init(void *handle) {
     il2cpp_thread_attach(domain);
 }
 
-char* jstringToChar(JNIEnv* env, jstring jstr) {
-    const char* utf_chars = env->GetStringUTFChars(jstr, NULL);
-    char* chars = new char[strlen(utf_chars) + 1];
-    strcpy(chars, utf_chars);
-    env->ReleaseStringUTFChars(jstr, utf_chars);
-    return chars;
+std::string Utf16ToUtf8(const Il2CppChar *utf16String, int maximumSize) {
+    const Il2CppChar *ptr = utf16String;
+    size_t length = 0;
+    while (*ptr) {
+        ptr++;
+        length++;
+        if (maximumSize != -1 && length == maximumSize)
+            break;
+    }
+ 
+    std::string utf8String;
+    utf8String.reserve(length);
+    utf8::unchecked::utf16to8(utf16String, ptr, std::back_inserter(utf8String));
+ 
+    return utf8String;
 }
-jstring getExternalStorageDirectory() {
-    jclass clazz = g_env->FindClass("android/os/Environment");
-    jmethodID getExternalStorageDirectory = g_env->GetStaticMethodID(clazz, "getExternalStorageDirectory", "()Ljava/io/File;");
-    jobject file_obj = g_env->CallStaticObjectMethod(clazz, getExternalStorageDirectory);
-
-    jclass file_clazz = g_env->GetObjectClass(file_obj);
-    jmethodID getPath = g_env->GetMethodID(file_clazz, "getPath", "()Ljava/lang/String;");
-    jstring path_obj = (jstring)g_env->CallObjectMethod(file_obj, getPath);
-
-    return path_obj;
+std::string Utf16ToUtf8(const Il2CppChar *utf16String) {
+    return Utf16ToUtf8(utf16String, -1);
+}
+std::string Il2CppStringToStdString(Il2CppString *str) {
+    auto chars = il2cpp_string_chars(str);
+    return Utf16ToUtf8(chars);
 }
 
-void hack_lua(const char *game_data_dir) {
+void hack_lua() {
     LOGI("start hack lua");
 
     // 初始化需要用到的dll
@@ -113,13 +119,10 @@ void hack_lua(const char *game_data_dir) {
     }
 
     // 初始化需要用到的函数
-    // auto application = il2cpp_class_from_name(unity_core, "UnityEngine", "Application");
-    // auto get_persistentDataPath = il2cpp_class_get_method_from_name(application, "get_persistentDataPath", 0);
-
-    // "/data/data/com.bilibili.azurlane/files/"
-    // "/storage/emulated/0/Android/data/com.bilibili.azurlane/files/"
-    std::string persis_dir(game_data_dir);
-    persis_dir.replace(0, 5, "/storage/emulated/0/Android");
-    LOGI("path : %s", persis_dir.c_str());
+    auto application = il2cpp_class_from_name(unity_core, "UnityEngine", "Application");
+    auto get_persistentDataPath = il2cpp_class_get_method_from_name(application, "get_persistentDataPath", 0);
+    typedef Il2CppString* (*get_persistentDataPath_ftn)(void *);
+    auto dir_path = ((get_persistentDataPath_ftn) get_persistentDataPath->methodPointer)(nullptr);
+    LOGI("path : %s", Il2CppStringToStdString(dir_path).c_str());
 }
 

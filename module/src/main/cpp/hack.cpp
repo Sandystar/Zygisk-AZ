@@ -33,7 +33,7 @@ void hack_start(const char *game_data_dir) {
             load = true;
             il2cpp_api_init(handle);
             // il2cpp_dump(game_data_dir);
-            hack_lua(game_data_dir);
+            hack_lua();
             break;
         } else {
             sleep(1);

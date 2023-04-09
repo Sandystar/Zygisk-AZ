@@ -428,11 +428,39 @@ void il2cpp_dump(const char *outDir) {
     LOGI("dump done!");
 }
 
+
+
+std::string Utf16ToUtf8(const Il2CppChar *utf16String, int maximumSize) {
+    const Il2CppChar *ptr = utf16String;
+    size_t length = 0;
+    while (*ptr) {
+        ptr++;
+        length++;
+        if (maximumSize != -1 && length == maximumSize)
+            break;
+    }
+ 
+    std::string utf8String;
+    utf8String.reserve(length);
+    utf8::unchecked::utf16to8(utf16String, ptr, std::back_inserter(utf8String));
+ 
+    return utf8String;
+}
+std::string Utf16ToUtf8(const Il2CppChar *utf16String) {
+    return Utf16ToUtf8(utf16String, -1);
+}
+std::string Il2CppStringToStdString(Il2CppString *str) {
+    auto chars = il2cpp_string_chars(str);
+    return Utf16ToUtf8(chars);
+}
+
 void hack_lua() {
     LOGI("start hack lua");
 
+    // 初始化需要用到的dll
     const Il2CppImage* game;
     const Il2CppImage* corlib;
+    const Il2CppImage* unity_core;
 
     size_t size;
     auto domain = il2cpp_domain_get();
@@ -444,13 +472,26 @@ void hack_lua() {
         if (strcmp(name, "Assembly-CSharp.dll") == 0)
         {
             game = image;
-            LOGI("match image: %s", name);
+            LOGI("image match: %s", name);
         }
         else if (strcmp(name, "mscorlib.dll") == 0)
         {
             corlib = image;
-            LOGI("image name: %s", name);
+            LOGI("image match: %s", name);
+        }
+        else if (strcmp(name, "UnityEngine.CoreModule.dll") == 0)
+        {
+            unity_core = image;
+            LOGI("image match: %s", name);
         }
     }
+
+    // 初始化需要用到的函数
+    auto application = il2cpp_class_from_name(unity_core, "UnityEngine", "Application");
+    auto get_persistentDataPath = il2cpp_class_get_method_from_name(application, "get_persistentDataPath", 0);
+    typedef Il2CppString* (*get_persistentDataPath_ftn)(void*);
+    auto ilstr_path = ((get_persistentDataPath_ftn) get_persistentDataPath->methodPointer)();
+    auto path = Il2CppStringToStdString(ilstr_path);
+    LOGI("path : %s", path);
 }
 

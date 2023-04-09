@@ -133,34 +133,4 @@ void hack_prepare(const char *game_data_dir, void *data, size_t length) {
 }
 
 #if defined(__arm__) || defined(__aarch64__)
-
-JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
-    // 设置g_env
-    vm->GetEnv((void **)&g_env, JNI_VERSION_1_6);
-
-    auto game_data_dir = (const char *) reserved;
-    std::thread hack_thread(hack_start, game_data_dir);
-    hack_thread.detach();
-    return JNI_VERSION_1_6;
-}
-
-char* jstringToChar(JNIEnv* env, jstring jstr) {
-    const char* utf_chars = env->GetStringUTFChars(jstr, NULL);
-    char* chars = new char[strlen(utf_chars) + 1];
-    strcpy(chars, utf_chars);
-    env->ReleaseStringUTFChars(jstr, utf_chars);
-    return chars;
-}
-jstring getExternalStorageDirectory() {
-    jclass clazz = g_env->FindClass("android/os/Environment");
-    jmethodID getExternalStorageDirectory = g_env->GetStaticMethodID(clazz, "getExternalStorageDirectory", "()Ljava/io/File;");
-    jobject file_obj = g_env->CallStaticObjectMethod(clazz, getExternalStorageDirectory);
-
-    jclass file_clazz = g_env->GetObjectClass(file_obj);
-    jmethodID getPath = g_env->GetMethodID(file_clazz, "getPath", "()Ljava/lang/String;");
-    jstring path_obj = (jstring)g_env->CallObjectMethod(file_obj, getPath);
-
-    return path_obj;
-}
-
 #endif

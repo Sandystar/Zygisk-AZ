@@ -31,7 +31,7 @@ include_directories(xdl/include)
 
 aux_source_directory(xdl xdl-src)
 
-add_library(${MODULE_NAME} SHARED main.cpp hack.cpp il2cpp_dump.cpp ${xdl-src})
+add_library(${MODULE_NAME} SHARED main.cpp hack.cpp il2cpp_lua.cpp ${xdl-src})
 target_link_libraries(${MODULE_NAME} log)
 
 if (NOT CMAKE_BUILD_TYPE STREQUAL "Debug")

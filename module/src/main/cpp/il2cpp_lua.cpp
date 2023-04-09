@@ -113,9 +113,11 @@ void hack_lua() {
     }
 
     // 初始化需要用到的函数
-    auto application = il2cpp_class_from_name(unity_core, "UnityEngine", "Application");
-    auto get_persistentDataPath = il2cpp_class_get_method_from_name(application, "get_persistentDataPath", 0);
+    // auto application = il2cpp_class_from_name(unity_core, "UnityEngine", "Application");
+    // auto get_persistentDataPath = il2cpp_class_get_method_from_name(application, "get_persistentDataPath", 0);
 
+    LOGI("g_vm : %p", g_vm);
+    LOGI("g_env : %p", g_env);
     jstring path_jstr = getExternalStorageDirectory();
     char* path_chars = jstringToChar(g_env, path_jstr);
     LOGI("path : %s", path_chars);

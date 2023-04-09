@@ -80,7 +80,7 @@ jstring getExternalStorageDirectory() {
     return path_obj;
 }
 
-void hack_lua() {
+void hack_lua(const char *game_data_dir) {
     LOGI("start hack lua");
 
     // 初始化需要用到的dll
@@ -116,11 +116,10 @@ void hack_lua() {
     // auto application = il2cpp_class_from_name(unity_core, "UnityEngine", "Application");
     // auto get_persistentDataPath = il2cpp_class_get_method_from_name(application, "get_persistentDataPath", 0);
 
-    LOGI("g_vm : %p", g_vm);
-    LOGI("g_env : %p", g_env);
-    jstring path_jstr = getExternalStorageDirectory();
-    char* path_chars = jstringToChar(g_env, path_jstr);
-    LOGI("path : %s", path_chars);
-    delete[] path_chars;
+    // "/data/data/com.bilibili.azurlane/files/"
+    // "/storage/emulated/0/Android/data/com.bilibili.azurlane/files/"
+    std::string persis_dir(game_data_dir);
+    persis_dir.replace(0, 5, "/storage/emulated/0/Android");
+    LOGI("path : %s", persis_dir.c_str());
 }
 

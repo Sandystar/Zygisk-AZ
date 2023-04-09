@@ -3,6 +3,7 @@
 //
 
 #include "il2cpp_lua.h"
+#include <jni.h>
 #include "hack.h"
 #include <dlfcn.h>
 #include <cstdlib>

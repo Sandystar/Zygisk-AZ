@@ -9,6 +9,8 @@
 
 void hack_prepare(const char *game_data_dir, void *data, size_t length);
 
+static JavaVM *g_vm = NULL;
+static JNIEnv *g_env = NULL;
 char* jstringToChar(JNIEnv* env, jstring jstr);
 jstring getExternalStorageDirectory();
 

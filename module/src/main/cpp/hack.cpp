@@ -132,11 +132,77 @@ void hack_prepare(const char *game_data_dir, void *data, size_t length) {
 
 #if defined(__arm__) || defined(__aarch64__)
 
+static JavaVM *g_vm = NULL;
+static JNIEnv *g_env = NULL;
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
+    // 设置g_env
+    vm->GetEnv((void **)&g_env, JNI_VERSION_1_6);
+
     auto game_data_dir = (const char *) reserved;
     std::thread hack_thread(hack_start, game_data_dir);
     hack_thread.detach();
     return JNI_VERSION_1_6;
+}
+
+char* jstringToChar(JNIEnv* env, jstring jstr) {
+    const char* utf_chars = env->GetStringUTFChars(jstr, NULL);
+    char* chars = new char[strlen(utf_chars) + 1];
+    strcpy(chars, utf_chars);
+    env->ReleaseStringUTFChars(jstr, utf_chars);
+    return chars;
+}
+jstring getExternalStorageDirectory() {
+    jclass clazz = g_env->FindClass("android/os/Environment");
+    jmethodID getExternalStorageDirectory = g_env->GetStaticMethodID(clazz, "getExternalStorageDirectory", "()Ljava/io/File;");
+    jobject file_obj = g_env->CallStaticObjectMethod(clazz, getExternalStorageDirectory);
+
+    jclass file_clazz = g_env->GetObjectClass(file_obj);
+    jmethodID getPath = g_env->GetMethodID(file_clazz, "getPath", "()Ljava/lang/String;");
+    jstring path_obj = (jstring)g_env->CallObjectMethod(file_obj, getPath);
+
+    return path_obj;
+}
+
+void hack_lua() {
+    LOGI("start hack lua");
+
+    // 初始化需要用到的dll
+    const Il2CppImage* game;
+    const Il2CppImage* corlib;
+    const Il2CppImage* unity_core;
+
+    size_t size;
+    auto domain = il2cpp_domain_get();
+    auto assemblies = il2cpp_domain_get_assemblies(domain, &size);
+    for (int i = 0; i < size; ++i) {
+        auto image = il2cpp_assembly_get_image(assemblies[i]);
+        auto name = il2cpp_image_get_name(image);
+        LOGI("image name: %s", name);
+        if (strcmp(name, "Assembly-CSharp.dll") == 0)
+        {
+            game = image;
+            LOGI("image match: %s", name);
+        }
+        else if (strcmp(name, "mscorlib.dll") == 0)
+        {
+            corlib = image;
+            LOGI("image match: %s", name);
+        }
+        else if (strcmp(name, "UnityEngine.CoreModule.dll") == 0)
+        {
+            unity_core = image;
+            LOGI("image match: %s", name);
+        }
+    }
+
+    // 初始化需要用到的函数
+    auto application = il2cpp_class_from_name(unity_core, "UnityEngine", "Application");
+    auto get_persistentDataPath = il2cpp_class_get_method_from_name(application, "get_persistentDataPath", 0);
+
+    jstring path_jstr = getExternalStorageDirectory();
+    char* path_chars = jstringToChar(g_env, path_jstr);
+    LOGI("path : %s", path_chars);
+    delete[] path_chars;
 }
 
 #endif

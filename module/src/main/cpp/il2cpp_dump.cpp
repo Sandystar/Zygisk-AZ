@@ -427,3 +427,30 @@ void il2cpp_dump(const char *outDir) {
     outStream.close();
     LOGI("dump done!");
 }
+
+void hack_lua() {
+    LOGI("start hack lua");
+
+    Il2CppImage* game;
+    Il2CppImage* corlib;
+
+    size_t size;
+    auto domain = il2cpp_domain_get();
+    auto assemblies = il2cpp_domain_get_assemblies(domain, &size);
+    for (int i = 0; i < size; ++i) {
+        auto image = il2cpp_assembly_get_image(assemblies[i]);
+        auto name = il2cpp_image_get_name(image);
+        LOGI("image name: %s", name);
+        if (strcmp(name, "Assembly-CSharp.dll") == 0)
+        {
+            game = image;
+            LOGI("match image: %s", name);
+        }
+        else if (strcmp(name, "mscorlib.dll") == 0)
+        {
+            corlib = image;
+            LOGI("image name: %s", name);
+        }
+    }
+}
+

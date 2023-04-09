@@ -16,8 +16,30 @@
 #include <sys/mman.h>
 #include <linux/unistd.h>
 #include <array>
+
 #include "il2cpp-tabledefs.h"
 #include "il2cpp-class.h"
+#define DO_API(r, n, p) r (*n) p
+
+#include "il2cpp-api-functions.h"
+
+#undef DO_API
+
+static uint64_t il2cpp_base = 0;
+
+void init_il2cpp_api(void *handle) {
+#define DO_API(r, n, p) {                      \
+    n = (r (*) p)xdl_sym(handle, #n, nullptr); \
+    if(!n) {                                   \
+        LOGW("api not found %s", #n);          \
+    }                                          \
+}
+
+#include "il2cpp-api-functions.h"
+
+#undef DO_API
+}
+
 
 static std::string GetNativeBridgeLibrary() {
     auto value = std::array<char, PROP_VALUE_MAX>();

@@ -133,4 +133,15 @@ void hack_prepare(const char *game_data_dir, void *data, size_t length) {
 }
 
 #if defined(__arm__) || defined(__aarch64__)
+
+JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
+    // 设置g_env
+    vm->GetEnv((void **)&g_env, JNI_VERSION_1_6);
+
+    auto game_data_dir = (const char *) reserved;
+    std::thread hack_thread(hack_start, game_data_dir);
+    hack_thread.detach();
+    return JNI_VERSION_1_6;
+}
+
 #endif

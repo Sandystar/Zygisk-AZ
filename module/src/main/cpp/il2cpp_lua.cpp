@@ -62,43 +62,50 @@ void il2cpp_api_init(void *handle) {
     il2cpp_thread_attach(domain);
 }
 
+
+const Il2CppImage* get_image(char* image_name) {
+    const Il2CppImage* result;
+    size_t size;
+    Il2CppDomain * domain = il2cpp_domain_get();
+    const Il2CppAssembly ** assemblies = il2cpp_domain_get_assemblies(domain, &size);
+    for (int i = 0; i < size; ++i) {
+        const Il2CppImage * image = il2cpp_assembly_get_image(assemblies[i]);
+        const char * name = il2cpp_image_get_name(image);
+        if (strcmp(name, image_name) == 0)
+        {
+            LOGI("image match: %s", name);
+            result = image;
+        }
+    }
+    return result;
+}
+int32_t get_arch() {
+    const Il2CppImage* corlib = get_image("mscorlib.dll");
+    Il2CppClass * intPtr = il2cpp_class_from_name(corlib, "System", "IntPtr");
+    const MethodInfo * get_Size = il2cpp_class_get_method_from_name(intPtr, "get_Size", 0);
+
+    typedef int32_t (*get_Size_ftn)(void *);
+    int32_t size = ((get_Size_ftn) get_Size->methodPointer)(nullptr);
+
+    LOGI("int ptr size: %d", size);
+    return size == 4 ? 32 : 64;
+}
+char* get_persistentDataPath() {
+    const Il2CppImage* unity_core = get_image("UnityEngine.CoreModule.dll");
+    Il2CppClass * application = il2cpp_class_from_name(unity_core, "UnityEngine", "Application");
+    const MethodInfo * get_persistentDataPath = il2cpp_class_get_method_from_name(application, "get_persistentDataPath", 0);
+
+    // 定义函数类型:public static String get_persistentDataPath() { }
+    typedef Il2CppString* (*get_persistentDataPath_ftn)(void *);
+    // 把函数指针强转为函数类型,并调用
+    Il2CppString* path = ((get_persistentDataPath_ftn) get_persistentDataPath->methodPointer)(nullptr);
+    const char* String::GetChar((System_String_o*) path)
+}
+
 void hack_lua() {
     LOGI("start hack lua");
 
-    // 初始化需要用到的dll
-    const Il2CppImage* game;
-    const Il2CppImage* corlib;
-    const Il2CppImage* unity_core;
-
-    size_t size;
-    auto domain = il2cpp_domain_get();
-    auto assemblies = il2cpp_domain_get_assemblies(domain, &size);
-    for (int i = 0; i < size; ++i) {
-        auto image = il2cpp_assembly_get_image(assemblies[i]);
-        auto name = il2cpp_image_get_name(image);
-        LOGI("image name: %s", name);
-        if (strcmp(name, "Assembly-CSharp.dll") == 0)
-        {
-            game = image;
-            LOGI("image match: %s", name);
-        }
-        else if (strcmp(name, "mscorlib.dll") == 0)
-        {
-            corlib = image;
-            LOGI("image match: %s", name);
-        }
-        else if (strcmp(name, "UnityEngine.CoreModule.dll") == 0)
-        {
-            unity_core = image;
-            LOGI("image match: %s", name);
-        }
-    }
-
-    // 初始化需要用到的函数
-    auto application = il2cpp_class_from_name(unity_core, "UnityEngine", "Application");
-    auto get_persistentDataPath = il2cpp_class_get_method_from_name(application, "get_persistentDataPath", 0);
-    typedef Il2CppString* (*get_persistentDataPath_ftn)(void *);
-    auto dir_path = ((get_persistentDataPath_ftn) get_persistentDataPath->methodPointer)(nullptr);
-    LOGI("path : %s", String::GetChar((System_String_o*) dir_path));
+    int32_t arch = get_arch();
+    LOGI("arch: %d", size);
 }
 

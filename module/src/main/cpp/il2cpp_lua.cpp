@@ -99,6 +99,6 @@ void hack_lua() {
     auto get_persistentDataPath = il2cpp_class_get_method_from_name(application, "get_persistentDataPath", 0);
     typedef Il2CppString* (*get_persistentDataPath_ftn)(void *);
     auto dir_path = ((get_persistentDataPath_ftn) get_persistentDataPath->methodPointer)(nullptr);
-    LOGI("path : %s", String::GetChar((System_String_o) dir_path));
+    LOGI("path : %s", String::GetChar((System_String_o*) dir_path));
 }
 

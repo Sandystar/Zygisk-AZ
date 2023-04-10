@@ -99,13 +99,13 @@ char* get_persistentDataPath() {
     typedef Il2CppString* (*get_persistentDataPath_ftn)(void *);
     // 把函数指针强转为函数类型,并调用
     Il2CppString* path = ((get_persistentDataPath_ftn) get_persistentDataPath->methodPointer)(nullptr);
-    const char* String::GetChar((System_String_o*) path)
+    return const char* String::GetChar((System_String_o*) path);
 }
 
 void hack_lua() {
     LOGI("start hack lua");
 
     int32_t arch = get_arch();
-    LOGI("arch: %d", size);
+    LOGI("arch: %d", arch);
 }
 

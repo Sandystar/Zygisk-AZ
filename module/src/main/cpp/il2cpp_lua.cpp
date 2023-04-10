@@ -90,7 +90,7 @@ int32_t get_arch() {
     LOGI("int ptr size: %d", size);
     return size == 4 ? 32 : 64;
 }
-char* get_persistentDataPath() {
+const char* get_persistentDataPath() {
     const Il2CppImage* unity_core = get_image("UnityEngine.CoreModule.dll");
     Il2CppClass * application = il2cpp_class_from_name(unity_core, "UnityEngine", "Application");
     const MethodInfo * get_persistentDataPath = il2cpp_class_get_method_from_name(application, "get_persistentDataPath", 0);

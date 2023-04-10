@@ -63,7 +63,7 @@ void il2cpp_api_init(void *handle) {
 }
 
 
-const Il2CppImage* get_image(char* image_name) {
+const Il2CppImage* get_image(const char* image_name) {
     const Il2CppImage* result;
     size_t size;
     Il2CppDomain * domain = il2cpp_domain_get();

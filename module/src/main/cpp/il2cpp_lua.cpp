@@ -106,7 +106,8 @@ const char* get_hack_name() {
     int32_t arch = get_arch();
     if (arch == 32) {
         return "Hack32";
-    } else if (arch == 64) {
+    } 
+    else {
         return "Hack64";
     } 
 }
@@ -127,8 +128,8 @@ char* get_hack_file() {
     return path;
 }
 
-int32_t (*old_loadbuffer) (intptr_t luaState, System_Byte_array* buff, int32_t size, System_String_o* name, const MethodInfo* method);
-int32_t new_loadbuffer (intptr_t luaState, System_Byte_array* buff, int32_t size, System_String_o* name, const MethodInfo* method) {
+int32_t (*old_loadbuffer) (intptr_t luaState, Il2CppArray* buff, int32_t size, System_String_o* name, const MethodInfo* method);
+int32_t new_loadbuffer (intptr_t luaState, Il2CppArray* buff, int32_t size, System_String_o* name, const MethodInfo* method) {
     LOGI("lua name: %s", String::GetChar(name));
     return old_loadbuffer(luaState, buff, size, name, method);
 }
@@ -136,11 +137,11 @@ int32_t new_loadbuffer (intptr_t luaState, System_Byte_array* buff, int32_t size
 void hack_lua() {
     LOGI("start hack lua");
 
-    int32_t hack_file = get_hack_file();
-    LOGI("hack_file: %d", hack_file);
+    char* hack_file = get_hack_file();
+    LOGI("hack_file: %s", hack_file);
 
     const Il2CppImage* game = get_image("Assembly-CSharp.dll");
-    Il2CppClass * luaDll = il2cpp_class_from_name(unity_core, "LuaInterface", "LuaDLL");
+    Il2CppClass * luaDll = il2cpp_class_from_name(game, "LuaInterface", "LuaDLL");
     const MethodInfo * tolua_loadbuffer = il2cpp_class_get_method_from_name(luaDll, "tolua_loadbuffer", 4);
 
     // typedef int32_t (*tolua_loadbuffer_ftn)(intptr_t, System_Byte_array*, int32_t, System_String_o*, const MethodInfo*);

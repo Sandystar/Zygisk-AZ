@@ -156,10 +156,12 @@ int32_t new_loadbuffer (intptr_t luaState, Il2CppArray* buff, int32_t size, Syst
     int32_t result = old_loadbuffer(luaState, buff, size, name, method);
     
     const char* chunk_name = String::GetChar(name);
+    LOGI("lua name: %s", chunk_name);
     if (strcmp(chunk_name, "@main.lua") == 0)
     {
         LOGI("lua match: %s", chunk_name);
         // 执行Hack
+        do_hack_file();
     }
     return result;
 }

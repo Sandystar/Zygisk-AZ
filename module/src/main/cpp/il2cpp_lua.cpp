@@ -179,3 +179,10 @@ void hack_lua() {
     hook_lua_load();    
 }
 
+        // let AssemblyCSharp = Il2Cpp.Domain.assembly("Assembly-CSharp").image;
+        // AssemblyCSharp.class("LuaScriptMgr").method("StartLua").implementation = function ()
+        // {
+        //     console.log("执行Lua");
+        //     this.method("StartLua").invoke();
+        //     DoHack();
+        // }

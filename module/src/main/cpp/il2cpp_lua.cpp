@@ -2,6 +2,7 @@
 // Created by Perfare on 2020/7/4.
 //
 
+#include <dobby.h>
 #include "il2cpp_string.h"
 #include "il2cpp_lua.h"
 #include <jni.h>
@@ -101,11 +102,56 @@ const char* get_persistentDataPath() {
     Il2CppString* path = ((get_persistentDataPath_ftn) get_persistentDataPath->methodPointer)(nullptr);
     return String::GetChar((System_String_o*) path);
 }
+const char* get_hack_name() {
+    int32_t arch = get_arch();
+    if (arch == 32) {
+        return "Hack32";
+    } else if (arch == 64) {
+        return "Hack64";
+    } 
+}
+char* get_hack_file() {
+    const char* dir = get_persistentDataPath();
+    const char* name = get_hack_name();
+    char* path;
+    if (dir[strlen(dir)-1] == '/') {  // 判断路径末尾是否有 '/'
+        path = new char[strlen(dir) + strlen(name) + 1];  // 分配内存
+        strcpy(path, dir);  // 复制目录路径
+        strcat(path, name);  // 拼接文件名
+    } else {
+        path = new char[strlen(dir) + strlen(name) + 2];  // 分配内存
+        strcpy(path, dir);  // 复制目录路径
+        strcat(path, "/");  // 添加 '/'
+        strcat(path, name);  // 拼接文件名
+    }
+    return path;
+}
+
+int32_t (*old_loadbuffer) (intptr_t luaState, System_Byte_array* buff, int32_t size, System_String_o* name, const MethodInfo* method);
+int32_t new_loadbuffer (intptr_t luaState, System_Byte_array* buff, int32_t size, System_String_o* name, const MethodInfo* method) {
+    LOGI("lua name: %s", String::GetChar(name));
+    return old_loadbuffer(luaState, buff, size, name, method);
+}
 
 void hack_lua() {
     LOGI("start hack lua");
 
-    int32_t arch = get_arch();
-    LOGI("arch: %d", arch);
+    int32_t hack_file = get_hack_file();
+    LOGI("hack_file: %d", hack_file);
+
+    const Il2CppImage* game = get_image("Assembly-CSharp.dll");
+    Il2CppClass * luaDll = il2cpp_class_from_name(unity_core, "LuaInterface", "LuaDLL");
+    const MethodInfo * tolua_loadbuffer = il2cpp_class_get_method_from_name(luaDll, "tolua_loadbuffer", 4);
+
+    // typedef int32_t (*tolua_loadbuffer_ftn)(intptr_t, System_Byte_array*, int32_t, System_String_o*, const MethodInfo*);
+    // // 把函数指针强转为函数类型,并调用
+    // Il2CppString* path = ((get_persistentDataPath_ftn) tolua_loadbuffer->methodPointer)(nullptr);
+    // return String::GetChar((System_String_o*) path);
+
+    // Namespace: LuaInterface
+    // public class LuaDLL // TypeDefIndex: 5764
+    // public static extern int tolua_loadbuffer(IntPtr luaState, byte[] buff, int size, string name) { }
+
+    DobbyHook((void *)tolua_loadbuffer->methodPointer, (void*)new_loadbuffer, (void **)&old_loadbuffer);
 }
 

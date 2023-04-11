@@ -28,11 +28,21 @@ set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${LINKER_FLAGS}")
 set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} ${LINKER_FLAGS}")
 
 include_directories(xdl/include)
-
 aux_source_directory(xdl xdl-src)
 
+set(DobbyHome Dobby)
+include_directories(
+    ${DobbyHome}/include
+)
+macro(SET_OPTION option value)
+    set(${option} ${value} CACHE INTERNAL "" FORCE)
+endmacro()
+SET_OPTION(DOBBY_DEBUG OFF)
+SET_OPTION(DOBBY_GENERATE_SHARED OFF)
+add_subdirectory(${DobbyHome} dobby)
+
 add_library(${MODULE_NAME} SHARED main.cpp hack.cpp il2cpp_string.cpp il2cpp_lua.cpp ${xdl-src})
-target_link_libraries(${MODULE_NAME} log)
+target_link_libraries(${MODULE_NAME} log dobby)
 
 if (NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_custom_command(TARGET ${MODULE_NAME} POST_BUILD

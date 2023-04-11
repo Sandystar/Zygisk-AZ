@@ -2,7 +2,7 @@
 // Created by Perfare on 2020/7/4.
 //
 
-// #include <dobby.h>
+#include "dobby.h"
 #include "il2cpp_string.h"
 #include "il2cpp_lua.h"
 #include <jni.h>

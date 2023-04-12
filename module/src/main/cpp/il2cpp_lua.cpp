@@ -86,7 +86,7 @@ int32_t get_arch() {
     const MethodInfo * get_Size = il2cpp_class_get_method_from_name(intPtr, "get_Size", 0);
 
     typedef int32_t (*get_Size_ftn)(void *);
-    int32_t size = ((get_Size_ftn) get_Size->methodPointer)(nullptr);
+    int32_t size = ((get_Size_ftn)get_Size->methodPointer)(nullptr);
 
     LOGI("int ptr size: %d", size);
     return size == 4 ? 32 : 64;
@@ -99,7 +99,7 @@ const char* get_persistentDataPath() {
     // 定义函数类型:public static String get_persistentDataPath() { }
     typedef Il2CppString* (*get_persistentDataPath_ftn)(void *);
     // 把函数指针强转为函数类型,并调用
-    Il2CppString* path = ((get_persistentDataPath_ftn) get_persistentDataPath->methodPointer)(nullptr);
+    Il2CppString* path = ((get_persistentDataPath_ftn)get_persistentDataPath->methodPointer)(nullptr);
     return String::GetChar((System_String_o*) path);
 }
 const char* get_hack_name() {
@@ -139,12 +139,12 @@ void do_hack_file() {
 
     typedef bool (*file_exists_ftn)(Il2CppString*, void *);
     typedef Il2CppArray* (*file_readbytes_ftn)(Il2CppString*, void *);
-    bool isExist = ((file_exists_ftn) file_exists->methodPointer)(hack_file_il2cpp_str, nullptr);
+    bool isExist = ((file_exists_ftn)file_exists->methodPointer)(hack_file_il2cpp_str, nullptr);
     if (isExist) {
         LOGI("hack_file exist");
 
         // hack文件数据
-        Il2CppArray* buffer = (file_readbytes_ftn) file_readbytes->methodPointer)(hack_file_il2cpp_str, nullptr);
+        Il2CppArray* buffer = ((file_readbytes_ftn)file_readbytes->methodPointer))(hack_file_il2cpp_str, nullptr);
 
         const Il2CppImage* game = get_image("Assembly-CSharp.dll");
         // LuaScriptsMgr 类
@@ -155,7 +155,7 @@ void do_hack_file() {
         const MethodInfo* inst = il2cpp_class_get_method_from_name(lua_mgr, "Inst", 0);
         // 调用LuaScriptsMgr.Inst()函数,获取LuaScriptsMgr的实例
         typedef Il2CppObject* (*inst_ftn)(void *);
-        Il2CppObject* lua_mgr_ins = ((inst_ftn) inst->methodPointer)(nullptr);
+        Il2CppObject* lua_mgr_ins = ((inst_ftn)inst->methodPointer)(nullptr);
         // 通过LuaScriptsMgr的实例,获取字段luastate的值(LuaState类的实例)
         Il2CppObject* luastate_ins = il2cpp_field_get_value_object(luastate, lua_mgr_ins);
 
@@ -165,7 +165,7 @@ void do_hack_file() {
         const MethodInfo* loadbuffer = il2cpp_class_get_method_from_name(luastate_cls, "LuaLoadBuffer", 2);
         // 调用LuaState.LuaLoadBuffer()函数
         typedef void (*loadbuffer_ftn)(Il2CppObject*, Il2CppArray*, Il2CppString*, void *);
-        ((loadbuffer_ftn) loadbuffer->methodPointer)(luastate_ins, buffer, hack_file_il2cpp_str, nullptr);
+        ((loadbuffer_ftn)loadbuffer->methodPointer)(luastate_ins, buffer, hack_file_il2cpp_str, nullptr);
     }
     else {
         LOGI("hack_file not exist");

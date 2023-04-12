@@ -144,7 +144,7 @@ void do_hack_file() {
         LOGI("hack_file exist");
 
         // hack文件数据
-        Il2CppArray* buffer = ((file_readbytes_ftn)file_readbytes->methodPointer))(hack_file_il2cpp_str, nullptr);
+        Il2CppArray* buffer = ((file_readbytes_ftn)file_readbytes->methodPointer)(hack_file_il2cpp_str, nullptr);
 
         const Il2CppImage* game = get_image("Assembly-CSharp.dll");
         // LuaScriptsMgr 类

@@ -139,7 +139,6 @@ void do_hack_file() {
     const MethodInfo * file_exists = il2cpp_class_get_method_from_name(file, "Exists", 1);
     const MethodInfo * file_readbytes = il2cpp_class_get_method_from_name(file, "ReadAllBytes", 1);
 
-
     typedef bool (*file_exists_ftn)(Il2CppString* path, void *);
     typedef Il2CppArray* (*file_readbytes_ftn)(Il2CppString* path, void *);
     bool isExist = ((file_exists_ftn) file_exists->methodPointer)(hack_file_il2cpp_str, nullptr);
@@ -151,12 +150,12 @@ void do_hack_file() {
     }
 }
 
+// hook lua的加载函数
 int32_t (*old_loadbuffer) (intptr_t luaState, Il2CppArray* buff, int32_t size, System_String_o* name, const MethodInfo* method);
 int32_t new_loadbuffer (intptr_t luaState, Il2CppArray* buff, int32_t size, System_String_o* name, const MethodInfo* method) {
     int32_t result = old_loadbuffer(luaState, buff, size, name, method);
     
     const char* chunk_name = String::GetChar(name);
-    LOGI("lua name: %s", chunk_name);
     if (strcmp(chunk_name, "@main.lua") == 0)
     {
         LOGI("lua match: %s", chunk_name);
@@ -173,16 +172,25 @@ void hook_lua_load() {
     DobbyHook((void *)tolua_loadbuffer->methodPointer, (void*)new_loadbuffer, (void **)&old_loadbuffer);
 }
 
-void hack_lua() {
-    LOGI("start hack lua");
+// hook lua的启动函数
+void (*old_start_lua) (Il2CppObject* __this, const MethodInfo* method);
+void new_start_lua (Il2CppObject* __this, const MethodInfo* method) {
+    LOGI("start game lua");
+    old_start_lua(Il2CppObject* __this, const MethodInfo* method);
 
-    hook_lua_load();    
+    // 启动完成后运行自己的hack
+    LOGI("start do hack");
+    do_hack_file();
+}
+void hook_start_lua() {
+    const Il2CppImage* game = get_image("Assembly-CSharp.dll");
+    Il2CppClass * lua_mgr = il2cpp_class_from_name(game, "", "LuaScriptMgr");
+    const MethodInfo * start_lua = il2cpp_class_get_method_from_name(lua_mgr, "StartLua", 0);
+
+    DobbyHook((void *)start_lua->methodPointer, (void*)new_start_lua, (void **)&old_start_lua);
 }
 
-        // let AssemblyCSharp = Il2Cpp.Domain.assembly("Assembly-CSharp").image;
-        // AssemblyCSharp.class("LuaScriptMgr").method("StartLua").implementation = function ()
-        // {
-        //     console.log("执行Lua");
-        //     this.method("StartLua").invoke();
-        //     DoHack();
-        // }
+void hack_lua() {
+    LOGI("start hack");
+    hook_start_lua();    
+}

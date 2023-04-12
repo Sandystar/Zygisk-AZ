@@ -130,7 +130,7 @@ char* get_hack_file() {
 void do_hack_file() {
     char* hack_file = get_hack_file();
     Il2CppString* hack_file_il2cpp_str = il2cpp_string_new(hack_file);
-    LOGI("hack_file: %s", hack_file);
+    LOGI("hack file: %s", hack_file);
 
     const Il2CppImage* corlib = il2cpp_get_corlib();
     Il2CppClass* file = il2cpp_class_from_name(corlib, "System.IO", "File");
@@ -140,32 +140,35 @@ void do_hack_file() {
     typedef bool (*file_exists_ftn)(Il2CppString*, void *);
     bool isExist = ((file_exists_ftn)file_exists->methodPointer)(hack_file_il2cpp_str, nullptr);
     if (isExist) {
-        LOGI("hack_file exist");
+        LOGI("hack file exist");
 
         // hack文件数据
         typedef Il2CppArray* (*file_readbytes_ftn)(Il2CppString*, void *);
         Il2CppArray* buffer = ((file_readbytes_ftn)file_readbytes->methodPointer)(hack_file_il2cpp_str, nullptr);
+        LOGI("hack file read succ: %p", buffer);
 
-        // const Il2CppImage* game = get_image("Assembly-CSharp.dll");
-        // // LuaScriptsMgr 类
-        // Il2CppClass* lua_mgr = il2cpp_class_from_name(game, "", "LuaScriptMgr");
-        // // LuaScriptsMgr.luaState 字段
-        // FieldInfo* luastate = il2cpp_class_get_field_from_name(lua_mgr, "luaState");
-        // // LuaScriptsMgr.Inst() 函数
-        // const MethodInfo* inst = il2cpp_class_get_method_from_name(lua_mgr, "Inst", 0);
-        // // 调用LuaScriptsMgr.Inst()函数,获取LuaScriptsMgr的实例
-        // typedef Il2CppObject* (*inst_ftn)(void *);
-        // Il2CppObject* lua_mgr_ins = ((inst_ftn)inst->methodPointer)(nullptr);
-        // // 通过LuaScriptsMgr的实例,获取字段luastate的值(LuaState类的实例)
-        // Il2CppObject* luastate_ins = il2cpp_field_get_value_object(luastate, lua_mgr_ins);
+        const Il2CppImage* game = get_image("Assembly-CSharp.dll");
+        // LuaScriptsMgr 类
+        Il2CppClass* lua_mgr = il2cpp_class_from_name(game, "", "LuaScriptMgr");
+        // LuaScriptsMgr.luaState 字段
+        FieldInfo* luastate = il2cpp_class_get_field_from_name(lua_mgr, "luaState");
+        // LuaScriptsMgr.get_Inst() 函数
+        const MethodInfo* get_Inst = il2cpp_class_get_method_from_name(lua_mgr, "get_Inst", 0);
+        // 调用LuaScriptsMgr.get_Inst()函数,获取LuaScriptsMgr的实例
+        typedef Il2CppObject* (*get_Inst_ftn)(void *);
+        Il2CppObject* lua_mgr_ins = ((get_Inst_ftn)get_Inst->methodPointer)(nullptr);
+        // 通过LuaScriptsMgr的实例,获取字段luastate的值(LuaState类的实例)
+        Il2CppObject* luastate_ins = il2cpp_field_get_value_object(luastate, lua_mgr_ins);
+        LOGI("lua_mgr_ins: %p", lua_mgr_ins);
+        LOGI("luastate_ins: %p", luastate_ins);
 
-        // // LuaState 类
-        // Il2CppClass* luastate_cls = il2cpp_class_from_name(game, "LuaInterface", "LuaState");
-        // // LuaState.LuaLoadBuffer() 函数
-        // const MethodInfo* loadbuffer = il2cpp_class_get_method_from_name(luastate_cls, "LuaLoadBuffer", 2);
-        // // 调用LuaState.LuaLoadBuffer()函数
-        // typedef void (*loadbuffer_ftn)(Il2CppObject*, Il2CppArray*, Il2CppString*, void *);
-        // ((loadbuffer_ftn)loadbuffer->methodPointer)(luastate_ins, buffer, hack_file_il2cpp_str, nullptr);
+        // LuaState 类
+        Il2CppClass* luastate_cls = il2cpp_class_from_name(game, "LuaInterface", "LuaState");
+        // LuaState.LuaLoadBuffer() 函数
+        const MethodInfo* loadbuffer = il2cpp_class_get_method_from_name(luastate_cls, "LuaLoadBuffer", 2);
+        // 调用LuaState.LuaLoadBuffer()函数
+        typedef void (*loadbuffer_ftn)(Il2CppObject*, Il2CppArray*, Il2CppString*, void *);
+        ((loadbuffer_ftn)loadbuffer->methodPointer)(luastate_ins, buffer, hack_file_il2cpp_str, nullptr);
     }
     else {
         LOGI("hack_file not exist");

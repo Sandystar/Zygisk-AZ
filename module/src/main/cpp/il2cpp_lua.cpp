@@ -138,13 +138,13 @@ void do_hack_file() {
     const MethodInfo* file_readbytes = il2cpp_class_get_method_from_name(file, "ReadAllBytes", 1);
 
     typedef bool (*file_exists_ftn)(Il2CppString*, void *);
-    typedef Il2CppArray* (*file_readbytes_ftn)(Il2CppString*, void *);
     bool isExist = ((file_exists_ftn)file_exists->methodPointer)(hack_file_il2cpp_str, nullptr);
     if (isExist) {
         LOGI("hack_file exist");
 
-        // // hack文件数据
-        // Il2CppArray* buffer = ((file_readbytes_ftn)file_readbytes->methodPointer)(hack_file_il2cpp_str, nullptr);
+        // hack文件数据
+        typedef Il2CppArray* (*file_readbytes_ftn)(Il2CppString*, void *);
+        Il2CppArray* buffer = ((file_readbytes_ftn)file_readbytes->methodPointer)(hack_file_il2cpp_str, nullptr);
 
         // const Il2CppImage* game = get_image("Assembly-CSharp.dll");
         // // LuaScriptsMgr 类

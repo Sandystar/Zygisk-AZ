@@ -176,7 +176,7 @@ void hook_lua_load() {
 void (*old_start_lua) (Il2CppObject* __this, const MethodInfo* method);
 void new_start_lua (Il2CppObject* __this, const MethodInfo* method) {
     LOGI("start game lua");
-    old_start_lua(Il2CppObject* __this, const MethodInfo* method);
+    old_start_lua(__this, method);
 
     // 启动完成后运行自己的hack
     LOGI("start do hack");
